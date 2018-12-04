@@ -14,7 +14,7 @@ ______   ____ |  | _____ _______|__| ______
 
 # Overview
 
-Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters that allows for easy setup of a cluster with all the essentials ready for application development and deployment. The authors of Polaris believe that event-driven microservice architectures will eat the current legacy RESTful request/response world, and therefore a slant towards hyper-scale, streaming technology is evident in the Polaris design. 
+Polaris is an open-source, opinionated & validated architecture for hyper-scale enterprise clusters that allows for easy setup of a cluster with all the essentials ready for application development and deployment. The authors of Polaris believe that event-driven microservice architectures will eat the current legacy RESTful request/response world, and therefore a slant towards hyper-scale, streaming technology is evident in the Polaris design. 
 
 Polaris has the following features:
 
