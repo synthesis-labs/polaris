@@ -361,7 +361,7 @@ $ helm install --name=aws-service-operator k8/charts/aws-service-operator
 Test that it's working by pushing an ECRRepository into the flux pipe or manually applying it - then login to AWS and list.
 ```
 
-14. Install polaris-kafka
+15. Install polaris-kafka
 
 ```
 $ helm --name polaris-kafka-cp-kafka --namespace app install polaris-kafka/
