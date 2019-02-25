@@ -2,7 +2,7 @@ mkdir -p "$HOME"/.ssh
 mkdir -p "$HOME"/.aws
 mkdir -p "$HOME"/.kube
 
-sudo docker run --rm -it \
+docker run --rm -it \
   -v "$HOME"/.ssh:/root/.ssh:rw \
   -v "$HOME"/.aws:/root/.aws:ro \
   -v "$HOME"/.kube:/root/.kube:rw \

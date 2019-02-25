@@ -1,4 +1,4 @@
-sudo docker run --rm -it \
+docker run --rm -it \
   -v "$HOME"/.ssh:/root/.ssh:rw \
   -v "$HOME"/.aws:/root/.aws:ro \
   -v "$HOME"/.kube:/root/.kube:rw \
