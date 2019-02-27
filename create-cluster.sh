@@ -61,7 +61,7 @@ kops create cluster \
    $1 $2 $3 $4 $5 $6 $7 $8 $9
 
 
-kops get --name ${CLUSTER_NAME} --state=s3://kops-mimic -o yaml > infrastructure/vanilla_cluster.yaml
+kops get --name ${CLUSTER_NAME} --state=s3://${STATE_BUCKET} -o yaml > infrastructure/vanilla_cluster.yaml
 
 ROOT=$( dirname "${BASH_SOURCE[0]}" )
 FOLDER=$ROOT/dex/ca

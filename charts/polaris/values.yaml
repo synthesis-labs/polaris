@@ -1,5 +1,5 @@
 global:
-  cluster-name: frodo.synthesis.rocks
+  cluster-name: <<CLUSTERNAME>>
 
 aws-service-operator:
   operator:
@@ -21,7 +21,7 @@ cluster-autoscaler:
   cloudProvider: aws
   awsRegion: eu-west-1
   autoscalingGroups:
-   - name: nodes.frodo.synthesis.rocks
+   - name: nodes.<<CLUSTERNAME>>
      minSize: 1
      maxSize: 6
 
@@ -55,9 +55,9 @@ dex:
     tlsName: dex-tls
     caName: dex-ca
   ingress:
-     host: dex.frodo.synthesis.rocks
+     host: dex.<<CLUSTERNAME>>
   config:
-    issuer: https://dex.frodo.synthesis.rocks
+    issuer: https://dex.<<CLUSTERNAME>>
   connectors:
   - type: microsoft
     id: microsoft
@@ -65,7 +65,7 @@ dex:
     config:
       clientID: 33d82f8b-4db4-4d99-b610-0768ddd246df
       clientSecret: lmwcHDOCUH74+zgbA152:]!
-      redirectURI: https://dex.frodo.synthesis.rocks/callback
+      redirectURI: https://dex.<<CLUSTERNAME>>/callback
     #  tenant: organizations
     #
     # Also - edit the application manifest (in MS Apps) and
@@ -81,7 +81,7 @@ dex:
   - id: kubectl-access
     redirectURIs:
     - 'http://127.0.0.1:5555/callback'
-    - 'https://login.frodo.synthesis.rocks/callback/frodo.synthesis.rocks'
+    - 'https://login.<<CLUSTERNAME>>/callback/<<CLUSTERNAME>>'
     name: 'Kubectl Access'
     secret: rkKR4TX1RsK8OvVVufe45KIsuxN4A86B
   enablePasswordDB: true
@@ -103,18 +103,18 @@ dex-k8s-authenticator:
     debug: false
     web_path_prefix: /
     clusters:
-    - name: frodo.synthesis.rocks
+    - name: <<CLUSTERNAME>>
       short_description: "Ref4 Cluster"
       description: "Reference number 4"
       client_secret: rkKR4TX1RsK8OvVVufe45KIsuxN4A86B
-      issuer: https://dex.frodo.synthesis.rocks
-      k8s_master_uri: https://api.frodo.synthesis.rocks
+      issuer: https://dex.<<CLUSTERNAME>>
+      k8s_master_uri: https://api.<<CLUSTERNAME>>
       client_id: kubectl-access
-      redirect_uri: https://login.frodo.synthesis.rocks/callback/frodo.synthesis.rocks
+      redirect_uri: https://login.<<CLUSTERNAME>>/callback/<<CLUSTERNAME>>
       #
       # Make this particular link public in s3:
       k8s_ca_uri:
-        https://s3-eu-west-1.amazonaws.com/kops-mimic/frodo.synthesis.rocks/pki/issued/ca/6661957841380198014448874128.crt
+        <<DEX_CRT>>
   caCerts:
     enabled: true
     secrets:
@@ -122,7 +122,7 @@ dex-k8s-authenticator:
     - name: ca1
       filename: ca1.crt
       value:
-        LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNxRENDQVpBQ0NRRDBvK0l3S0pmNXlEQU5CZ2txaGtpRzl3MEJBUXNGQURBV01SUXdFZ1lEVlFRRERBdGsKWlhndGEzVmlaUzFqWVRBZUZ3MHhPVEF5TWpVeE5URTRNamxhRncwME5qQTNNVEl4TlRFNE1qbGFNQll4RkRBUwpCZ05WQkFNTUMyUmxlQzFyZFdKbExXTmhNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDCkFRRUFybDhaNGZQV0o2LzZaT1MxTFJ4eHpIWThmVnR3RXdVU3lqVXVURzkvT05RWWZCOHdNSkpGSmR2YWhVRnMKQjdubVU4KzYxd1RyYk1tYW5BK2Yxdy9jbjNZL1dlaHdCYWl5U0NERGpmL0pkUlpnVFMwdk5vaEJYNWYvUk5IRQpnVTlhYTIxQzJmdDFVTWpCWFMvMmdhM3ArZUh6WVNSQ0RNYm5seUhsenhNOFZyc0hXaHRINFN5a0RzTWRaY0gzClpWV3psaFBqYXU2cDRrWDgzaVRoNXBwV1ZHMnBwTDFFaTdKYm1ucTJUdEZLYmVubVllbWprKzYyWlN1WmtKSEoKcDlCakp2VVEvVG9STTcwN294Vmc3MzF0T2ZKR0NtSEpPN3NYU2J6ZkhwVm4rWWcrR2tBWTBlbHBMS3djeW1JVApobjg4Zkt2YkFpb2pEZzdwbkZsb2Z2dUVuUUlEQVFBQk1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQ0sxR0tuCmdJY1dsRGlkR3VVcmVXb2ZjdjBqVHd6UENzU09NSVg4amRDbUlCUG5TM2hNVUF0QThZNFA4bVdqVG9wRCtSdHYKbmlWaUk1eVd0RDdRMnJOSjJ5VnZncmFGSkpjSVI5a241N1BSKzZiK3VWclUrblhpcE9Rb3hjUENBb1BZK09kbwp3RFJNbURic3IyU3Q1WlpTT2U3c0NQYmRESXlaS1RXVW5zSlJyVEMwS3h6eUZmc1dDL2ZDYkhJTkVBc09Ic1JFClJZTUdUdmRrTHQ3YkFqa0dSbTVFRmFidC9uUTl3bHhaU1JZL2ZBMTgzZjVJSzRJVndwZVJoZTBLL0lHOVBqNHIKSzR1cDhsd2pUOHZkREUyb00zV0piSmRvWEtXNmFDYjh5R2Q3WitGUGJQbGFxMWVITmlZL0RBcEdQV2tPaG53NQo2MDE4THFKQ016U1hvM2RvCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+        <<DEX_BASE64>>
   ingress:
     enabled: true
     annotations: {}
@@ -130,7 +130,7 @@ dex-k8s-authenticator:
       # kubernetes.io/tls-acme: "true"
     path: /
     hosts:
-      - login.frodo.synthesis.rocks
+      - login.<<CLUSTERNAME>>
     tls:
       - hosts:
-        - login.frodo.synthesis.rocks
+        - login.<<CLUSTERNAME>>
