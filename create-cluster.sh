@@ -47,7 +47,7 @@ kops create cluster \
    --networking cilium             `# kubenet, classic, external, kopeio-vxlan, kopeio), weave, flannel-vxlan, flannel, flannel-udp, calico, canal, kube-router, romana, amazon-vpc-routed-eni, cilium` \
    --node-count ${NODE_COUNT}      `# Number of worker nodes` \
    `#--node-security-groups         # Existing SGs to apply to nodes` \
-   --node-size m4.large             `# Node instance type` \
+   --node-size m4.xlarge             `# Node instance type` \
    `#--node-tenancy default          # [default | dedicated]` \
    --node-volume-size 30           `# Node volume size in GB` \
    `#--project                      # Project to use (must be set on GCE)` \

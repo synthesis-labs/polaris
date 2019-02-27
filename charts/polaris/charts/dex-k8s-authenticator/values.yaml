@@ -20,8 +20,8 @@ dexK8sAuthenticator:
   #tlsKey: /path/to/dex-client.key
   clusters:
   - name: <<CLUSTERNAME>>
-    short_description: "Ref4 Cluster"
-    description: "Reference number 4"
+    short_description: <<CLUSTERDESCRIPTION>>
+    description: "This cluster is build from a automated script"
     client_secret: rkKR4TX1RsK8OvVVufe45KIsuxN4A86B
     issuer: https://dex.<<CLUSTERNAME>>
     k8s_master_uri: https://api.<<CLUSTERNAME>>

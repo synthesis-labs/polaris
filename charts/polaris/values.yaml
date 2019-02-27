@@ -58,14 +58,14 @@ dex:
      host: dex.<<CLUSTERNAME>>
   config:
     issuer: https://dex.<<CLUSTERNAME>>
-  connectors:
-  - type: microsoft
-    id: microsoft
-    name: Microsoft
-    config:
-      clientID: 33d82f8b-4db4-4d99-b610-0768ddd246df
-      clientSecret: lmwcHDOCUH74+zgbA152:]!
-      redirectURI: https://dex.<<CLUSTERNAME>>/callback
+  connectors: []
+  #- type: microsoft
+    #id: microsoft
+    #name: Microsoft
+    #config:
+      #clientID: 33d82f8b-4db4-4d99-b610-0768ddd246df
+      #clientSecret: lmwcHDOCUH74+zgbA152:]!
+      #redirectURI: https://dex.<<CLUSTERNAME>>/callback
     #  tenant: organizations
     #
     # Also - edit the application manifest (in MS Apps) and
@@ -86,16 +86,11 @@ dex:
     secret: rkKR4TX1RsK8OvVVufe45KIsuxN4A86B
   enablePasswordDB: true
   staticPasswords:
-  - email: "admin@example.com"
+  - email: "admin@synthesis.com"
     # bcrypt hash of the string "password"
     hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
     username: "admin"
     userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
-  - email: "retail@example.com"
-    # bcrypt hash of the string "password"
-    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
-    username: "retail"
-    userID: "08a8684b-db88-4b73-90a9-3cd1661f5467"
 
 dex-k8s-authenticator:
   dexK8sAuthenticator:
@@ -104,8 +99,8 @@ dex-k8s-authenticator:
     web_path_prefix: /
     clusters:
     - name: <<CLUSTERNAME>>
-      short_description: "Ref4 Cluster"
-      description: "Reference number 4"
+      short_description: <<CLUSTERDESCRIPTION>>
+      description: "This cluster is build from a automated script"
       client_secret: rkKR4TX1RsK8OvVVufe45KIsuxN4A86B
       issuer: https://dex.<<CLUSTERNAME>>
       k8s_master_uri: https://api.<<CLUSTERNAME>>

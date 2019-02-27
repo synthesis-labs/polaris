@@ -19,6 +19,7 @@ TEMP_CRT_CREDS=$(cat dex/ca/dex-ca-cert.pem | base64 -w 0)
 TEMP_CRT_NAME_ESCAPED=$(echo $TEMP_CRT_NAME | sed 's/\//\\\//g')
 
 sed -i 's/<<CLUSTERNAME>>/'${CLUSTER_NAME}'/g' charts/polaris/values.yaml
+sed -i 's/<<CLUSTERDESCRIPTION>>/'${CLUSTER_SHORT_DESCRIPTION}'/g' charts/polaris/values.yaml
 sed -i 's/<<DEX_BASE64>>/'${TEMP_CRT_CREDS}'/g' charts/polaris/values.yaml
 sed -i 's/<<DEX_CRT>>/https:\/\/s3-eu-west-1.amazonaws.com\/'${STATE_BUCKET}'\/'${CLUSTER_NAME}'\/pki\/issued\/ca\/'${TEMP_CRT_NAME_ESCAPED}'/g' charts/polaris/values.yaml
 
@@ -27,6 +28,7 @@ sed -i 's/<<DEX_BASE64>>/'${TEMP_CRT_CREDS}'/g' charts/polaris/charts/dex/values
 sed -i 's/<<DEX_CRT>>/https:\/\/s3-eu-west-1.amazonaws.com\/'${STATE_BUCKET}'\/'${CLUSTER_NAME}'\/pki\/issued\/ca\/'${TEMP_CRT_NAME_ESCAPED}'/g' charts/polaris/charts/dex/values.yaml
 
 sed -i 's/<<CLUSTERNAME>>/'${CLUSTER_NAME}'/g' charts/polaris/charts/dex-k8s-authenticator/values.yaml
+sed -i 's/<<CLUSTERDESCRIPTION>>/'${CLUSTER_SHORT_DESCRIPTION}'/g' charts/polaris/charts/dex-k8s-authenticator/values.yaml
 sed -i 's/<<DEX_BASE64>>/'${TEMP_CRT_CREDS}'/g' charts/polaris/charts/dex-k8s-authenticator/values.yaml
 sed -i 's/<<DEX_CRT>>/https:\/\/s3-eu-west-1.amazonaws.com\/'${STATE_BUCKET}'\/'${CLUSTER_NAME}'\/pki\/issued\/ca\/'${TEMP_CRT_NAME_ESCAPED}'/g' charts/polaris/charts/dex-k8s-authenticator/values.yaml
 
