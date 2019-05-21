@@ -10,7 +10,5 @@ stable/external-dns
 stable/cluster-autoscaler
 stable/nginx-ingress
 stable/metrics-server
-coreos/kube-prometheus
-coreos/prometheus-operator
 stable/dex
 weaveworks/flux

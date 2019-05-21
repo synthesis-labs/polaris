@@ -1,0 +1,16 @@
+CLUSTER_NAME=cv.hackathon.s7s.cloud
+CLUSTER_SHORT_DESCRIPTION=Computer-Vision
+STATE_BUCKET=hackathon-computer-vision-bucket
+
+REGION=eu-west-1
+AVAILABILITY_ZONES=eu-west-1a
+KUBERNETES_VERSION=1.10.5
+
+MASTER_ZONES=eu-west-1a
+CLUSTER_CIDR=10.192.0.0/16
+MASTER_COUNT=1
+NODE_COUNT=3
+
+AWS_PROFILE=default
+
+IMAGE=595879546273/CoreOS-stable-1855.4.0-hvm

@@ -1,0 +1,80 @@
+  fileAssets:
+  - name: dex-ca-cert
+    path: /srv/kubernetes/assets/dex-ca-cert.pem
+    roles: [Master] # a list of roles to apply the asset to, zero defaults to all
+    content: |
+      <<URL>>
+  kubeAPIServer:
+    oidcIssuerURL: <<DEX_ENDPOINT>>
+    oidcClientID: kubectl-access
+    oidcUsernameClaim: email
+    oidcGroupsClaim: groups
+    oidcCAFile: /srv/kubernetes/assets/dex-ca-cert.pem
+  additionalPolicies:
+    node: |
+      [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "route53:ListHostedZones",
+            "route53:ListResourceRecordSets"
+          ],
+          "Resource": [
+            "*"
+          ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "route53:ChangeResourceRecordSets"
+          ],
+          "Resource": [
+            "arn:aws:route53:::hostedzone/*"
+          ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "ec2:AttachVolume",
+            "ec2:DetachVolume"
+          ],
+          "Resource": [
+            "*"
+          ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "autoscaling:DescribeAutoScalingGroups",
+            "autoscaling:DescribeAutoScalingInstances",
+            "autoscaling:DescribeLaunchConfigurations",
+            "autoscaling:DescribeTags",
+            "autoscaling:SetDesiredCapacity",
+            "autoscaling:TerminateInstanceInAutoScalingGroup"
+          ],
+          "Resource": "*"
+        },
+        {
+           "Effect": "Allow",
+            "Action": [
+                "codecommit:BatchGet*",
+                "codecommit:Get*",
+                "codecommit:Describe*",
+                "codecommit:List*",
+                "codecommit:GitPull"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+              "sqs:*",
+              "sns:*",
+              "cloudformation:*",
+              "ecr:*",
+              "dynamodb:*",
+              "s3:*"
+            ],
+            "Resource": "*"
+        }
+      ]

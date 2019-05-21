@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: grafana
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: grafana.frodo.synthesis.rocks
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: polaris-prometheus-operator-grafana
+          servicePort: 80
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: prometheus
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: prometheus.frodo.synthesis.rocks
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: polaris-prometheus-operato-prometheus
+          servicePort: 9090

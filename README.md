@@ -14,7 +14,7 @@ ______   ____ |  | _____ _______|__| ______
 
 # Overview
 
-Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters that allows for easy setup of a cluster with all the essentials ready for application development and deployment. The authors of Polaris believe that event-driven microservice architectures will eat the current legacy RESTful request/response world, and therefore a slant towards hyper-scale, streaming technology is evident in the Polaris design. 
+Polaris is an open-source, opiniated & validated architecture for hyper-scale enterprise clusters that allows for easy setup of a cluster with all the essentials ready for application development and deployment. The authors of Polaris believe that event-driven microservice architectures will eat the current legacy RESTful request/response world, and therefore a slant towards hyper-scale, streaming technology is evident in the Polaris design.
 
 Polaris has the following features:
 
@@ -84,7 +84,7 @@ You can view the [kops aws docs](https://github.com/kubernetes/kops/blob/master/
 
 ```
   The Helm client can be installed either from source, or from pre-built binary releases.
-  
+
   From Snap(Linux)
   $ sudo snap install helm --classic
 
@@ -95,277 +95,41 @@ You can view the [kops aws docs](https://github.com/kubernetes/kops/blob/master/
   $ choco install kubernetes-helm
 ```
 
-2. Generate the DEX Certificate Authority bits
+2. Run cluster script which creates your vanilla cluster it also generates yaml files in infrastructure/
 
 ```
-$ dex/gen-dex-ca.sh
+$ sudo ./run-cluster
+
+Wait for cluster to come up it should have atleast one master node and one worker node in status READY also make sure all operators are READY
 ```
 
-3. Create SSH key that will be used by the Kubernetes cluster 
+3. Run polaris script which install polaris operators on your cluster
 
 ```
-$ ssh-keygen -t rsa
+$ sudo ./run-polaris
 ```
 
-4. Create the cluster definition using kops
+4. Install polaris-kafka
 
 ```
-$ create-cluster.sh
+$ helm --name polaris-kafka-cp-kafka --namespace app install polaris-kafka/
+
+Deploy other containers to this namespace to interact with Kafka topics
 ```
 
-5. Edit the cluster to CA cert, OIDC and additional policies:
+5. Cleanup
 
 ```
-$ kops edit cluster --state=s3://kops-state-bucket --name=example.cluster.k8s --yes
+$ kops delete cluster kops delete cluster example.cluster.k8s --state s3://{bucket_name} --yes
 
-Then add under spec:
-  fileAssets:
-  - name: dex-ca-cert
-    path: /srv/kubernetes/assets/dex-ca-cert.pem
-    roles: [Master] # a list of roles to apply the asset to, zero defaults to all
-    content: |
-      *<< CONTENTS OF /dex/ca/dex-ca-cert.pem >>*
-  kubeAPIServer:
-    oidcIssuerURL: *<< URL FOR DEX HERE (eg. https://dex.example.cluster.k8s) >>*
-    oidcClientID: kubectl-access
-    oidcUsernameClaim: email
-    oidcGroupsClaim: groups
-    oidcCAFile: /srv/kubernetes/assets/dex-ca-cert.pem
-  additionalPolicies:
-    node: |
-      [
-        {
-          "Effect": "Allow",
-          "Action": [
-            "route53:ListHostedZones",
-            "route53:ListResourceRecordSets"
-          ],
-          "Resource": [
-            "*"
-          ]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "route53:ChangeResourceRecordSets"
-          ],
-          "Resource": [
-            "arn:aws:route53:::hostedzone/*"
-          ]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "ec2:AttachVolume",
-            "ec2:DetachVolume"
-          ],
-          "Resource": [
-            "*"
-          ]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "autoscaling:DescribeAutoScalingGroups",
-            "autoscaling:DescribeAutoScalingInstances",
-            "autoscaling:DescribeLaunchConfigurations",
-            "autoscaling:DescribeTags",
-            "autoscaling:SetDesiredCapacity",
-            "autoscaling:TerminateInstanceInAutoScalingGroup"
-          ],
-          "Resource": "*"
-        },
-        {
-           "Effect": "Allow",
-            "Action": [
-                "codecommit:BatchGet*",
-                "codecommit:Get*",
-                "codecommit:Describe*",
-                "codecommit:List*",
-                "codecommit:GitPull"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-              "sqs:*",
-              "sns:*",
-              "cloudformation:*",
-              "ecr:*",
-              "dynamodb:*",
-              "s3:*"
-            ],
-            "Resource": "*"
-        }
-      ]
-```
-
-6. Edit polaris/values.yaml file to change the cluster name,region, etc.
-
-```
-Dex and Dex-k8s-authenticator:
-- enables RBAC for kubectl accsess (logs user into their cluster), gets the CA
-  cert from s3 after the cluster has been created.
-
-Cluster-autoscaler: 
-- automatically adjusts the size of a Kubernetes Cluster so that all pods have a
-  place to run and there are no unneeded nodes.
-
-nginx-ingress:
-- allows simple host or URL based HTTP routing.
-
-Flux:
-- watches the changes on ECR and communicates updates to cluster to be
-  deployed
-
-polaris-prometheus-operator:
- - Installs prometheus-operator (https://github.com/coreos/prometheusoperator) to create/configure/manage Prometheus clusters atop Kubernetes (i.e.
-   The Prometheus Operator for Kubernetes provides easy monitoring definitions
-   for Kubernetes services and deployment and management of Prometheus instances.)
-
-charts/polaris:
- - installs the addons with the predefined configurations from the helm
-   packages located in the same directory and customized with all the values above
-
-```
-
-7. Edit the node instance group to enable spot instances (Optional - for running cheap).
-
-```
-$ kops edit ig nodes --state=s3://kops-state-bucket --name=example.cluster.k8s
-
-Then add under spec:
-  maxPrice: "0.10"
-  minSize: 1
-  maxSize: 6
-```
-
-8. Create the cluster.
-
-```
-Test run:
-$ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s
-
-Apply changes:
-$ kops update cluster --state=s3://kops-state-bucket --name=example.cluster.k8s --yes
-
-... wait for cluster to come up ...
-$ watch -d 'kubectl get nodes -o wide; kubectl get pods --all-namespaces'
-```
-
-9. Create Polaris Namespace and Install ServiceAccounts, helm and charts.
-
-```
-$ kubectl create namespace polaris
-
-$ kubectl apply -f k8/serviceaccounts/tiller-serviceaccount.yaml
-
-$ helm init --service-account helm-tiller --upgrade --debug --wait
-
-$ helm upgrade --namespace polaris --install polaris-prometheus-operator charts/prometheus-operator-0.0.29.tgz
-
-$ helm upgrade --namespace polaris --install polaris charts/polaris
-```
-10. Setup DEX
-
-```
-Install the dex certificates:
-
-
-
-$ kubectl create configmap dex-ca --namespace polaris --from-file dex-ca.pem=dex/ca/dex-ca-cert.pem
-
-$ kubectl create secret tls dex-ca --namespace polaris --cert=dex/ca/dex-ca-cert.pem --key=dex/ca/dex-ca-key.pem
-
-$ kubectl create secret tls dex-tls --namespace polaris --cert=dex/ca/dex-issuer-cert.pem --key=dex/ca/dex-issuer-key.pem
-
-Hit dex on https://dex.example.cluster.k8s/.well-known/openid-configuration and ensure you get the dex-kube-issuer cert.
-
-Modify charts/dex-k8s-authenticator/values.yaml and ensure:
-1. CA certificate link is set to public in S3
-2. CA certificate contents exists in cacerts section (as base64 encoded value)
-
-Install a clusterrole for the admin@example.com administrator:
-
-$ kubectl apply --namespace polaris -f k8/serviceaccounts/admin@example.com.yaml
-```
-
-11. Login and get a kubectl token:
-
-```
-https://login.example.cluster.k8s
-
-Load up the kube-config as directed (maybe take a backup of existing!)
-```
-
-12. Setup Flux for CD
-
-```
-Create a code-commit repo in AWS (manually for now...) - e.g. kubernetes-example-cluster.
-
-Create an IAM user in AWS (manually for now...) - e.g. flux-example-user.
-
-Create an HTTPS Git credentials for AWS CodeCommit for that IAM user, and note the
-username and password.
-
-Edit charts/flux/values.yaml and ensure you setup the following:
-git.url to have the correct username and password, VERY IMPORTANT that the password is URLEncoded! Otherwise you will get weird errors from flux.
-
-$ kubectl create namespace devops
-
-$ helm upgrade --namespace devops --install flux k8/charts/flux
-
-Watch flux log itself connecting and syncing the repository.
-
-You should now be able to:
-
-$ fluxctl --k8s-fwd-ns polaris list-controllers
-
-$ fluxctl --k8s-fwd-ns polaris list-images
-
-Any specs you put in /cluster-repo and push will be applied to the cluster.
-
-Charts must be in /cluster-repo/charts and a corresponding release/blah.yaml containing
-a FluxHelmRelease for it would also be applied.
-
-Cool watch to see stuff happening:
-
-$ watch -d 'fluxctl --k8s-fwd-ns polaris -n example list-controllers; fluxctl --k8s-fwd-ns polaris -n example list-images -c example:deployment/example-example'
-
-Then to setup example as an automated deployment:
-
-$ fluxctl --k8s-fwd-ns polaris -n example automate -c example:fluxhelmrelease/example
-```
-
-13. Upgrade Cilium to newer version (to avoid a crash when applying CiliumNetworkPolicies):
-
-```
-$ kubectl edit deployment daemonset cilium -n kube-system
-
-Change from:
-  image: cilium/cilium:v1.0-stable
-to:
-  image: cilium/cilium:v1.2
-
-Then delete every cilium pod (and have it restart).
-```
-
-14. Install aws-service-operator (early beta, but cool for creating ECRs)
-
-```
-Edit values and make sure you have sane values:
-
-$ helm install --name=aws-service-operator k8/charts/aws-service-operator
-
-Test that it's working by pushing an ECRRepository into the flux pipe or manually applying it - then login to AWS and list.
+Also remove files from dex folder and revert all changes in git to start again.
 ```
 
 ## Other administrative stuff
 
 - Shell access to the cluster (using creators id_rsa):
 ```
-$ ssh -i ~/.ssh/id_rsa admin@api.example.cluster.k8s
+$ ssh -i ~/.ssh/polaris@api.example.cluster.k8s
 ```
 
 ## Related Polaris Projects
